@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import useSWR from 'swr';
-import { productApi, ProductWithDetail } from '@/lib/api';
+import { productApi, ProductWithDetail, Product, Review } from '@/lib/api';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ErrorMessage from '@/components/ErrorMessage';
 
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
           <div className="space-y-4">
-            {product.reviews.map((review) => (
+            {product.reviews.map((review: Review) => (
               <div key={review.id} className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-semibold">{review.author}</p>
@@ -174,7 +174,7 @@ export default function ProductDetailPage() {
         <div>
           <h2 className="text-2xl font-bold mb-6">Recommended Products</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {product.recommendedProducts.map((rec) => (
+            {product.recommendedProducts.map((rec: Product) => (
               <Link
                 key={rec.id}
                 href={`/products/${rec.id}`}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useSWR from 'swr';
-import { productApi, PaginatedProducts } from '@/lib/api';
+import { productApi, PaginatedProducts, Product } from '@/lib/api';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ErrorMessage from '@/components/ErrorMessage';
 import Pagination from '@/components/Pagination';
@@ -119,7 +119,7 @@ export default function ProductsPage() {
       ) : data && data.products.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {data.products.map((product) => (
+            {data.products.map((product: Product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.id}`}

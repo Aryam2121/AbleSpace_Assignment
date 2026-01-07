@@ -67,7 +67,7 @@ export default function HomePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
               {navigations && navigations.length > 0 ? (
-                navigations.map((nav) => (
+                navigations.map((nav: Navigation) => (
                   <Link
                     key={nav.id}
                     href={`/categories/${nav.slug}`}

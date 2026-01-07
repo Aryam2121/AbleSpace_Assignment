@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import useSWR from 'swr';
-import { categoryApi } from '@/lib/api';
+import { categoryApi, Category, Product } from '@/lib/api';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ErrorMessage from '@/components/ErrorMessage';
 import Pagination from '@/components/Pagination';
@@ -65,7 +65,7 @@ export default function CategoryPage() {
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4">Subcategories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {category.children.map((child) => (
+            {category.children.map((child: Category) => (
               <Link
                 key={child.id}
                 href={`/categories/${child.slug}`}
@@ -85,7 +85,7 @@ export default function CategoryPage() {
       {category.products && category.products.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {category.products.map((product: any) => (
+            {category.products.map((product: Product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.id}`}
