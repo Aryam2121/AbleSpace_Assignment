@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Navigation {
+  id             String     @id @default(uuid())
+  title          String
+  slug           String     @unique
+  lastScrapedAt  DateTime?  @map("last_scraped_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+  
+  categories     Category[]
+
+  @@index([slug])
+  @@index([lastScrapedAt])
+  @@map("navigation")
+}
+
+model Category {
+  id             String     @id @default(uuid())
+  navigationId   String     @map("navigation_id")
+  parentId       String?    @map("parent_id")
+  title          String
+  slug           String
+  productCount   Int        @default(0) @map("product_count")
+  lastScrapedAt  DateTime?  @map("last_scraped_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+  
+  navigation     Navigation @relation(fields: [navigationId], references: [id], onDelete: Cascade)
+  parent         Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children       Category[] @relation("CategoryToCategory")
+  products       Product[]
+
+  @@unique([navigationId, slug])
+  @@index([slug])
+  @@index([navigationId])
+  @@index([parentId])
+  @@index([lastScrapedAt])
+  @@map("category")
+}
+
+model Product {
+  id             String         @id @default(uuid())
+  sourceId       String         @unique @map("source_id")
+  categoryId     String?        @map("category_id")
+  title          String
+  author         String?
+  price          Float
+  currency       String         @default("GBP")
+  imageUrl       String?        @map("image_url")
+  sourceUrl      String         @unique @map("source_url")
+  lastScrapedAt  DateTime?      @map("last_scraped_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  
+  category       Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  detail         ProductDetail?
+  reviews        Review[]
+
+  @@index([sourceId])
+  @@index([categoryId])
+  @@index([lastScrapedAt])
+  @@index([price])
+  @@map("product")
+}
+
+model ProductDetail {
+  id                String   @id @default(uuid())
+  productId         String   @unique @map("product_id")
+  description       String?
+  specs             String?
+  ratingsAvg        Float?   @map("ratings_avg")
+  reviewsCount      Int      @default(0) @map("reviews_count")
+  recommendations   String?  @default("[]")
+  publisher         String?
+  publicationDate   String?  @map("publication_date")
+  isbn              String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_detail")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String   @map("product_id")
+  author    String
+  rating    Float
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([rating])
+  @@map("review")
+}
+
+model ScrapeJob {
+  id          String    @id @default(uuid())
+  targetUrl   String    @map("target_url")
+  targetType  String    @map("target_type")
+  status      String    @default("pending")
+  startedAt   DateTime? @map("started_at")
+  finishedAt  DateTime? @map("finished_at")
+  errorLog    String?   @map("error_log")
+  attempts    Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([targetType])
+  @@index([createdAt])
+  @@map("scrape_job")
+}
+
+model ViewHistory {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  sessionId  String   @map("session_id")
+  pathJson   String   @map("path_json")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("view_history")
+}
