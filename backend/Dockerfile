@@ -55,4 +55,4 @@ USER nestjs
 EXPOSE 3001
 
 # Start the application
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "DATABASE_URL=$DATABASE_URL npx prisma migrate deploy && node dist/main"]
