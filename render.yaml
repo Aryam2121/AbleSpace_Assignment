@@ -1,0 +1,51 @@
+services:
+  # Backend API Service
+  - type: web
+    name: product-explorer-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        fromDatabase:
+          name: product-explorer-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: product-explorer-redis
+          property: connectionString
+      - key: SCRAPING_DELAY_MS
+        value: 2000
+      - key: SCRAPING_TIMEOUT_MS
+        value: 30000
+      - key: CACHE_TTL_HOURS
+        value: 24
+      - key: MAX_CONCURRENT_SCRAPES
+        value: 3
+      - key: FRONTEND_URL
+        value: https://product-explorer-frontend.onrender.com
+    healthCheckPath: /api/health
+
+  # Frontend Service
+  - type: web
+    name: product-explorer-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://product-explorer-backend.onrender.com/api
+
+databases:
+  - name: product-explorer-db
+    databaseName: product_explorer
+    user: postgres
+    plan: starter
+
+  - name: product-explorer-redis
+    plan: starter
